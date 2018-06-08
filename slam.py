@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-06 16:53:32
-#  Last Modified:  2018-06-08 11:48:33
+#  Last Modified:  2018-06-08 14:06:28
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -69,7 +69,6 @@ class MySprite(pygame.sprite.Sprite):
         self.image = img
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = cordinate
-        # self.mask = pygame.mask.from_threshold(img, (255, 255, 255), (0, 0, 0))
         self.mask = pygame.mask.from_surface(self.image)
 
 
@@ -80,13 +79,8 @@ def test():
                 pygame.quit()
                 exit()
 
-        #screen.fill((0, 0, 0))
         screen.fill((0, 255, 0))
-        # pygame.draw.rect(screen, (255, 255, 255),
-        # [0, 0, display_width, display_height], 10)
 
-        # for (p, c) in genBlockObject():
-        # screen.blit(p, c)
         gbo = genBlockObject()
         pic1, p1 = gbo[0]
         sp1 = MySprite(pic1, p1)
@@ -100,7 +94,6 @@ def test():
         if pygame.sprite.collide_mask(sp1, sp2):
             print("collide:", p1, p2)
             raw_input()
-            # return
 
 
 def test2():
@@ -119,8 +112,8 @@ def test2():
         s1 = MySprite(p1, c1)
         s2 = MySprite(p2, c2)
 
-        pygame.draw.rect(screen, (255, 0, 0),s1.rect,1)
-        pygame.draw.rect(screen, (255, 0, 0),s2.rect,1)
+        pygame.draw.rect(screen, (255, 0, 0), s1.rect, 1)
+        pygame.draw.rect(screen, (255, 0, 0), s2.rect, 1)
 
         screen.blit(p1, c1)
         screen.blit(p2, c2)
@@ -133,6 +126,33 @@ def test2():
 
         raw_input()
         pygame.display.update()
+
+
+def genBlockObjectsprite():
+    screen.fill((0, 0, 0))
+
+    p1, c1 = getRandomPic()
+    s1 = MySprite(p1, c1)
+
+    sGroup = pygame.sprite.Group()
+    sGroup.add(s1)
+
+    screen.blit(p1, c1)
+    pygame.draw.rect(screen, (255, 0, 0), s1.rect, 1)
+
+    for i in xrange(10):
+        p, c = getRandomPic()
+        s = MySprite(p, c)
+        if pygame.sprite.spritecollide(s, sGroup, False,
+                                       pygame.sprite.collide_mask):
+            print("collide detected")
+        else:
+            sGroup.add(s)
+            screen.blit(p, c)
+            pygame.draw.rect(screen, (255, 0, 0), s.rect, 1)
+
+    pygame.display.update()
+    return sGroup
 
 
 if __name__ == '__main__':
@@ -148,4 +168,11 @@ if __name__ == '__main__':
 
     loadres()
     # test()
-    test2()
+    # test2()
+    genBlockObjectsprite()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                exit()
