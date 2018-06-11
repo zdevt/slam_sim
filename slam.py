@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-06 16:53:32
-#  Last Modified:  2018-06-09 13:41:37
+#  Last Modified:  2018-06-11 09:52:08
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -14,6 +14,7 @@
 #   Organization:
 
 import os
+import math
 import pygame
 from pygame.locals import *
 from sys import exit
@@ -23,11 +24,15 @@ from PIL import Image
 display_width = 800
 display_height = 600
 display_res = (display_width, display_height)
-robotsize = (100, 100)
+
+robotsize = (50, 50)
 FPS = 10
+
+delta = 5
 
 slam = {}
 pic = {}
+slam['map'] = []
 
 
 def convertPicToAlpha(file):
@@ -77,6 +82,9 @@ class MySprite(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = cordinate
         self.mask = pygame.mask.from_surface(self.image)
 
+    def getxy(self):
+        return (self.rect.x, self.rect.y)
+
     def setxy(self, x, y):
         self.rect.x = x
         self.rect.y = y
@@ -84,21 +92,52 @@ class MySprite(pygame.sprite.Sprite):
     def draw(self, s):
         s.blit(self.image, (self.rect.x, self.rect.y))
 
-    def up(self):
-        self.rect.y -= 5
+    def up(self, d=delta):
+        if self.rect.y >= d:
+            self.rect.y -= d
 
-    def down(self):
-        self.rect.y += 5
+    def down(self, d=delta):
+        if self.rect.y + d < display_height:
+            self.rect.y += d
 
-    def left(self):
-        self.rect.x -= 5
+    def left(self, d=delta):
+        if self.rect.x >= d:
+            self.rect.x -= d
 
-    def right(self):
-        self.rect.x += 5
+    def right(self, d=delta):
+        if self.rect.x + d < display_width:
+            self.rect.x += d
 
 
 def getRobotSprite():
     slam['robot'] = MySprite(loadRobot(), (0, 0))
+
+
+def getVirsualLidar():
+    img = pygame.transform.smoothscale(
+        pygame.image.load('000.png').convert(), (1, 1))
+    img.set_colorkey((0, 0, 0))
+    slam['vlidar'] = MySprite(img, (0, 0))
+
+
+def virtualLidarScan(r, x, y):
+    p = {}
+    oldx, oldy = r.getxy()
+    for i in xrange(0, 360):
+        a = []
+        p[i] = a
+        for l in xrange(1,display_width):
+            lx = x + l * math.cos(math.radians(i))
+            ly = y - l * math.sin(math.radians(i))
+            r.setxy(lx, ly)
+            if collideCheck(r, slam['g1']):
+                p[i].append(l)
+    for k,v in p.items():
+        if v:
+            l = min(v)
+            lx = x + l * math.cos(math.radians(k))
+            ly = y - l * math.sin(math.radians(k))
+            pygame.draw.line(slam['screen'], (255, 0, 0), (x, y), (lx, ly))
 
 
 def getBlockObjectSpriteGroup():
@@ -132,6 +171,36 @@ def moveIt(s, key):
         s.right()
 
 
+def collideCheck(s, sg):
+    if pygame.sprite.spritecollide(s, sg, False, pygame.sprite.collide_mask):
+        # print("collide", s.rect)
+        return True
+    return False
+
+
+def rdMoveIt(s):
+    oldx = s.rect.x
+    oldy = s.rect.y
+    d = random.randrange(1, 5)
+    if d == 1:
+        s.up()
+    elif d == 2:
+        s.down()
+    elif d == 3:
+        s.left()
+    elif d == 4:
+        s.right()
+
+    if collideCheck(s, slam['g1']):
+        s.setxy(oldx, oldy)
+    else:
+        m = s.getxy()
+        if m not in slam['map']:
+            slam['map'].append(m)
+        else:
+            s.setxy(oldx, oldy)
+
+
 if __name__ == '__main__':
     pygame.init()
     slam['screen'] = pygame.display.set_mode(display_res, 0, 32)
@@ -142,18 +211,20 @@ if __name__ == '__main__':
     getBlockObjectSpriteGroup()
     getRobotSprite()
 
-    if pygame.sprite.spritecollide(slam['robot'], slam['g1'], False,
-                                   pygame.sprite.collide_mask):
-        print("collide", slam['robot'])
-
     while True:
         slam['screen'].fill((0, 0, 0))
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 exit()
-        key = pygame.key.get_pressed()
-        moveIt(slam['robot'], key)
+
+        # rdMoveIt(slam['robot'])
+        # moveIt(slam['robot'], pygame.key.get_pressed())
+        # collideCheck(slam['robot'], slam['g1'])
+        getVirsualLidar()
+        virtualLidarScan(slam['vlidar'], 100, 100)
+
         slam['g1'].draw(slam['screen'])
         slam['robot'].draw(slam['screen'])
+
         pygame.display.update()
