@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-06 16:53:32
-#  Last Modified:  2018-06-11 09:52:08
+#  Last Modified:  2018-06-12 09:28:44
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -126,13 +126,13 @@ def virtualLidarScan(r, x, y):
     for i in xrange(0, 360):
         a = []
         p[i] = a
-        for l in xrange(1,display_width):
+        for l in xrange(1, display_width, 5):
             lx = x + l * math.cos(math.radians(i))
             ly = y - l * math.sin(math.radians(i))
             r.setxy(lx, ly)
             if collideCheck(r, slam['g1']):
                 p[i].append(l)
-    for k,v in p.items():
+    for k, v in p.items():
         if v:
             l = min(v)
             lx = x + l * math.cos(math.radians(k))
@@ -210,6 +210,8 @@ if __name__ == '__main__':
     loadres()
     getBlockObjectSpriteGroup()
     getRobotSprite()
+    x = 0
+    y = 0
 
     while True:
         slam['screen'].fill((0, 0, 0))
@@ -222,9 +224,13 @@ if __name__ == '__main__':
         # moveIt(slam['robot'], pygame.key.get_pressed())
         # collideCheck(slam['robot'], slam['g1'])
         getVirsualLidar()
-        virtualLidarScan(slam['vlidar'], 100, 100)
+        x += 4
+        y += 3
+        virtualLidarScan(slam['vlidar'], x, y)
 
         slam['g1'].draw(slam['screen'])
-        slam['robot'].draw(slam['screen'])
+
+        # slam['robot'].draw(slam['screen'])
+        # slam['fpsclock'].tick(FPS)
 
         pygame.display.update()
