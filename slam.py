@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-06 16:53:32
-#  Last Modified:  2018-06-12 09:28:44
+#  Last Modified:  2018-06-13 11:36:10
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -195,10 +195,10 @@ def rdMoveIt(s):
         s.setxy(oldx, oldy)
     else:
         m = s.getxy()
-        if m not in slam['map']:
-            slam['map'].append(m)
-        else:
-            s.setxy(oldx, oldy)
+        # if m not in slam['map']:
+            # slam['map'].append(m)
+        # else:
+            # s.setxy(oldx, oldy)
 
 
 if __name__ == '__main__':
@@ -220,17 +220,17 @@ if __name__ == '__main__':
                 pygame.quit()
                 exit()
 
-        # rdMoveIt(slam['robot'])
+        # getVirsualLidar()
+        # x += 4
+        # y += 3
+        # virtualLidarScan(slam['vlidar'], x, y)
+
         # moveIt(slam['robot'], pygame.key.get_pressed())
-        # collideCheck(slam['robot'], slam['g1'])
-        getVirsualLidar()
-        x += 4
-        y += 3
-        virtualLidarScan(slam['vlidar'], x, y)
-
+        rdMoveIt(slam['robot'])
+        collideCheck(slam['robot'], slam['g1'])
         slam['g1'].draw(slam['screen'])
+        slam['robot'].draw(slam['screen'])
 
-        # slam['robot'].draw(slam['screen'])
         # slam['fpsclock'].tick(FPS)
 
         pygame.display.update()
