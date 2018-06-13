@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-06 16:53:32
-#  Last Modified:  2018-06-13 11:36:10
+#  Last Modified:  2018-06-13 17:10:21
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -173,7 +173,7 @@ def moveIt(s, key):
 
 def collideCheck(s, sg):
     if pygame.sprite.spritecollide(s, sg, False, pygame.sprite.collide_mask):
-        # print("collide", s.rect)
+        print("collide", s.rect)
         return True
     return False
 
@@ -225,8 +225,8 @@ if __name__ == '__main__':
         # y += 3
         # virtualLidarScan(slam['vlidar'], x, y)
 
-        # moveIt(slam['robot'], pygame.key.get_pressed())
-        rdMoveIt(slam['robot'])
+        moveIt(slam['robot'], pygame.key.get_pressed())
+        # rdMoveIt(slam['robot'])
         collideCheck(slam['robot'], slam['g1'])
         slam['g1'].draw(slam['screen'])
         slam['robot'].draw(slam['screen'])
