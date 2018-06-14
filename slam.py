@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-06 16:53:32
-#  Last Modified:  2018-06-14 15:47:11
+#  Last Modified:  2018-06-14 15:52:57
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -239,10 +239,10 @@ def rdMoveIt(s, flag, di):
         return (True, d)
 
 
-def moveTo(s, p):
+def moveTo(s, dst):
     oldx = s.rect.x
     oldy = s.rect.y
-    dstx, dsty = p
+    dstx, dsty = dst
 
     pass
 
