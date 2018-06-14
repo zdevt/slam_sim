@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-06 16:53:32
-#  Last Modified:  2018-06-13 17:10:21
+#  Last Modified:  2018-06-14 11:57:23
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -33,6 +33,7 @@ delta = 5
 slam = {}
 pic = {}
 slam['map'] = []
+slam['track'] = []
 
 
 def convertPicToAlpha(file):
@@ -88,6 +89,8 @@ class MySprite(pygame.sprite.Sprite):
     def setxy(self, x, y):
         self.rect.x = x
         self.rect.y = y
+        slam['track'].append((x, y))
+        print(x, y)
 
     def draw(self, s):
         s.blit(self.image, (self.rect.x, self.rect.y))
@@ -109,8 +112,13 @@ class MySprite(pygame.sprite.Sprite):
             self.rect.x += d
 
 
+def drawTrack(t):
+    for i in xrange(len(t) - 1):
+        pygame.draw.line(slam['screen'], (255, 0, 0), t[i], t[i + 1])
+
+
 def getRobotSprite():
-    slam['robot'] = MySprite(loadRobot(), (0, 0))
+    slam['robot'] = MySprite(loadRobot(), (60, 60))
 
 
 def getVirsualLidar():
@@ -141,13 +149,14 @@ def virtualLidarScan(r, x, y):
 
 
 def getBlockObjectSpriteGroup():
-    p1, c1 = getRandomPic()
-    s1 = MySprite(p1, c1)
+    bg = pygame.image.load("001.png").convert()
+    bg.set_colorkey((0, 0, 0))
 
+    s1 = MySprite(bg, (0, 0))
     g1 = pygame.sprite.Group()
     g1.add(s1)
 
-    for i in xrange(10):
+    for i in xrange(12):
         p, c = getRandomPic()
         s = MySprite(p, c)
         if pygame.sprite.spritecollide(s, g1, False,
@@ -172,16 +181,25 @@ def moveIt(s, key):
 
 
 def collideCheck(s, sg):
-    if pygame.sprite.spritecollide(s, sg, False, pygame.sprite.collide_mask):
-        print("collide", s.rect)
+    blocklist = pygame.sprite.spritecollide(s, sg, False,
+                                            pygame.sprite.collide_mask)
+    if blocklist:
+        # print("collide", s.rect)
+        for b in blocklist:
+            print("collide", b)
         return True
     return False
 
 
-def rdMoveIt(s):
+def rdMoveIt(s, flag, di):
     oldx = s.rect.x
     oldy = s.rect.y
-    d = random.randrange(1, 5)
+
+    if flag:
+        d = di
+    else:
+        d = random.choice([i for i in xrange(1, 5) if i != di])
+
     if d == 1:
         s.up()
     elif d == 2:
@@ -191,14 +209,21 @@ def rdMoveIt(s):
     elif d == 4:
         s.right()
 
+    # print(flag, di, d)
+
     if collideCheck(s, slam['g1']):
         s.setxy(oldx, oldy)
+        return (False, d)
     else:
-        m = s.getxy()
-        # if m not in slam['map']:
-            # slam['map'].append(m)
-        # else:
-            # s.setxy(oldx, oldy)
+        return (True, d)
+
+
+def moveTo(s, p):
+    oldx = s.rect.x
+    oldy = s.rect.y
+    dstx, dsty = p
+
+    pass
 
 
 if __name__ == '__main__':
@@ -212,6 +237,8 @@ if __name__ == '__main__':
     getRobotSprite()
     x = 0
     y = 0
+    flag = False
+    d = 0
 
     while True:
         slam['screen'].fill((0, 0, 0))
@@ -219,17 +246,36 @@ if __name__ == '__main__':
             if event.type == QUIT:
                 pygame.quit()
                 exit()
+            elif event.type == MOUSEBUTTONDOWN:
+                pressed_array = pygame.mouse.get_pressed()
+                for index in xrange(len(pressed_array)):
+                    if pressed_array[index]:
+                        if index == 0:
+                            print("Pressed LEFT Button!")
+                        elif index == 1:
+                            print("The mouse whell Pressed!")
+                        elif index == 2:
+                            print("Pressed RIGHT Button!")
+                pos = pygame.mouse.get_pos()
+                print(pos)
+            elif event.type == MOUSEMOTION:
+                pos = pygame.mouse.get_pos()
+                mouse_x = pos[0]
+                mouse_y = pos[1]
+                # print(pos)
 
         # getVirsualLidar()
         # x += 4
         # y += 3
         # virtualLidarScan(slam['vlidar'], x, y)
 
-        moveIt(slam['robot'], pygame.key.get_pressed())
-        # rdMoveIt(slam['robot'])
+        # moveIt(slam['robot'], pygame.key.get_pressed())
+        flag, d = rdMoveIt(slam['robot'], flag, d)
         collideCheck(slam['robot'], slam['g1'])
+
         slam['g1'].draw(slam['screen'])
         slam['robot'].draw(slam['screen'])
+        # drawTrack(slam['track'])
 
         # slam['fpsclock'].tick(FPS)
 
