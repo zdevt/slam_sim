@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-06 16:53:32
-#  Last Modified:  2018-06-14 11:57:23
+#  Last Modified:  2018-06-14 15:47:11
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -21,12 +21,12 @@ from sys import exit
 import random
 from PIL import Image
 
-display_width = 800
-display_height = 600
+display_width, display_height = 800, 600
 display_res = (display_width, display_height)
 
-robotsize = (50, 50)
-FPS = 10
+robotsize = (30, 30)
+robotStartPos = (15, 15)
+FPS = 1
 
 delta = 5
 
@@ -82,6 +82,7 @@ class MySprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = cordinate
         self.mask = pygame.mask.from_surface(self.image)
+        self.dir = 1
 
     def getxy(self):
         return (self.rect.x, self.rect.y)
@@ -92,24 +93,39 @@ class MySprite(pygame.sprite.Sprite):
         slam['track'].append((x, y))
         print(x, y)
 
+    def rotate(self, angle):
+        self.image = pygame.transform.rotate(self.image, angle)
+
     def draw(self, s):
         s.blit(self.image, (self.rect.x, self.rect.y))
 
     def up(self, d=delta):
         if self.rect.y >= d:
             self.rect.y -= d
+        an = [0, 0, -180, -90, -270]
+        self.rotate(an[self.dir])
+        self.dir = 1
 
     def down(self, d=delta):
         if self.rect.y + d < display_height:
             self.rect.y += d
+        an = [0, -180, 0, -270, -90]
+        self.rotate(an[self.dir])
+        self.dir = 2
 
     def left(self, d=delta):
         if self.rect.x >= d:
             self.rect.x -= d
+        an = [0, -270, -90, 0, -180]
+        self.rotate(an[self.dir])
+        self.dir = 3
 
     def right(self, d=delta):
         if self.rect.x + d < display_width:
             self.rect.x += d
+        an = [0, -90, -270, -180, 0]
+        self.rotate(an[self.dir])
+        self.dir = 4
 
 
 def drawTrack(t):
@@ -118,7 +134,7 @@ def drawTrack(t):
 
 
 def getRobotSprite():
-    slam['robot'] = MySprite(loadRobot(), (60, 60))
+    slam['robot'] = MySprite(loadRobot(), robotStartPos)
 
 
 def getVirsualLidar():
@@ -138,6 +154,11 @@ def virtualLidarScan(r, x, y):
             lx = x + l * math.cos(math.radians(i))
             ly = y - l * math.sin(math.radians(i))
             r.setxy(lx, ly)
+
+            (w, h) = robotsize
+            (x1, y1) = (x - w / 2, y - h / 2)
+            slam['robot'].setxy(x1, y1)
+
             if collideCheck(r, slam['g1']):
                 p[i].append(l)
     for k, v in p.items():
@@ -235,8 +256,8 @@ if __name__ == '__main__':
     loadres()
     getBlockObjectSpriteGroup()
     getRobotSprite()
-    x = 0
-    y = 0
+    (x, y) = robotStartPos
+
     flag = False
     d = 0
 
@@ -257,7 +278,7 @@ if __name__ == '__main__':
                         elif index == 2:
                             print("Pressed RIGHT Button!")
                 pos = pygame.mouse.get_pos()
-                print(pos)
+                # print(pos)
             elif event.type == MOUSEMOTION:
                 pos = pygame.mouse.get_pos()
                 mouse_x = pos[0]
