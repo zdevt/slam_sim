@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-06 16:53:32
-#  Last Modified:  2018-06-14 15:52:57
+#  Last Modified:  2018-06-19 08:58:48
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -26,7 +26,7 @@ display_res = (display_width, display_height)
 
 robotsize = (30, 30)
 robotStartPos = (15, 15)
-FPS = 1
+FPS = 10
 
 delta = 5
 
@@ -78,11 +78,13 @@ def genBlockObject():
 class MySprite(pygame.sprite.Sprite):
     def __init__(self, img, cordinate):
         pygame.sprite.Sprite.__init__(self)
-        self.image = img
+        self.oldimage = img
+        self.image = self.oldimage
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = cordinate
         self.mask = pygame.mask.from_surface(self.image)
         self.dir = 1
+        self.angle = 0
 
     def getxy(self):
         return (self.rect.x, self.rect.y)
@@ -94,7 +96,23 @@ class MySprite(pygame.sprite.Sprite):
         print(x, y)
 
     def rotate(self, angle):
-        self.image = pygame.transform.rotate(self.image, angle)
+        self.image = pygame.transform.rotate(self.oldimage, angle)
+
+    def front(self, distance=delta):
+        pass
+
+    def back(self, distance=delta):
+        pass
+
+    def turnLeft(self, angle):
+        self.angle = self.angle + angle
+        self.rotate(self.angle + angle)
+        print(self.angle, self.rect.x, self.rect.y)
+
+    def trunRight(self, angle):
+        self.angle = self.angle - angle
+        self.rotate(self.angle - angle)
+        print(self.angle, self.rect.x, self.rect.y)
 
     def draw(self, s):
         s.blit(self.image, (self.rect.x, self.rect.y))
@@ -196,9 +214,11 @@ def moveIt(s, key):
     elif key[pygame.K_s]:
         s.down()
     elif key[pygame.K_a]:
-        s.left()
+        # s.left()
+        s.turnLeft(10)
     elif key[pygame.K_d]:
-        s.right()
+        # s.right()
+        s.trunRight(10)
 
 
 def collideCheck(s, sg):
@@ -298,6 +318,6 @@ if __name__ == '__main__':
         slam['robot'].draw(slam['screen'])
         # drawTrack(slam['track'])
 
-        # slam['fpsclock'].tick(FPS)
+        slam['fpsclock'].tick(FPS)
 
         pygame.display.update()
