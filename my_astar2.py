@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-21 13:37:41
-#  Last Modified:  2018-06-21 14:56:39
+#  Last Modified:  2018-06-21 15:21:15
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -40,7 +40,6 @@ FPS = 10
 
 WHITE = (255, 255, 255)
 
-_2dmap = []
 start = None
 end = None
 
@@ -48,7 +47,6 @@ block_list = []
 tracklist = []
 open_list = {}
 close_list = {}
-maplist = {}
 
 
 class Node:
@@ -176,7 +174,6 @@ def mark_path(node):
         return
 
     pos = (node.x, node.y)
-    # fillRect(pos, (0, 255, 0))
     tracklist.append(pos)
     mark_path(node.father)
 
@@ -225,6 +222,11 @@ def drawMap():
     for t in tracklist:
         fillRect(t, (0, 255, 0))
 
+    if start:
+        fillRect((start.x, start.y), (0, 0, 255))
+    if end:
+        fillRect((end.x, end.y), (255, 0, 0))
+
 
 if __name__ == "__main__":
     pygame.init()
@@ -232,8 +234,6 @@ if __name__ == "__main__":
     pygame.display.set_caption('slam')
     FPSCLOCK = pygame.time.Clock()
 
-    start = Node(None, 0, 0)
-    end = Node(None, xcnt - 2, ycnt - 2)
     genMap()
 
     flag = False
@@ -246,24 +246,32 @@ if __name__ == "__main__":
                 exit()
             elif event.type == MOUSEBUTTONDOWN:
                 pressed_array = pygame.mouse.get_pressed()
-                # for index in xrange(len(pressed_array)):
-                # if pressed_array[index]:
-                # if index == 0:
-                # # print("Pressed LEFT Button!")
-                # p = getPosxyByXy(pygame.mouse.get_pos())
-                # c = maplist[p]
-                # c.setStart()
-                # elif index == 1:
-                # print("The mouse whell Pressed!")
-                # elif index == 2:
-                # # print("Pressed RIGHT Button!")
-                # p = getPosxyByXy(pygame.mouse.get_pos())
-                # c = maplist[p]
-                # c.setEnd()
+                for index in xrange(len(pressed_array)):
+                    if pressed_array[index]:
+                        if index == 0:
+                            (x, y) = getPosxyByXy(pygame.mouse.get_pos())
+                            start = Node(None, x, y)
+                        elif index == 1:
+                            print("The mouse whell Pressed!")
+                        elif index == 2:
+                            (x, y) = getPosxyByXy(pygame.mouse.get_pos())
+                            end = Node(None, x, y)
 
-        if not flag and find_the_path(start, end):
+                            flag = True
+
+                            open_list.clear()
+                            close_list.clear()
+                            del tracklist[:]
+
+                            for p in block_list:
+                                (posx, posy) = p
+                                block_node = Node(None, posx, posy)
+                                close_list[(block_node.x,
+                                            block_node.y)] = block_node
+
+        if flag and find_the_path(start, end):
             mark_path(end.father)
-            flag = True
+            flag = False
 
         drawMap()
 
