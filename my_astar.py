@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-19 16:22:23
-#  Last Modified:  2018-06-20 14:42:20
+#  Last Modified:  2018-06-21 11:45:25
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -21,6 +21,8 @@ from sys import exit
 import random
 from PIL import Image
 
+delta = 20
+
 display_width, display_height = 800, 600
 display_res = (display_width + 1, display_height + 1)
 
@@ -29,10 +31,12 @@ closedlist = []
 tracklist = []
 maplist = {}
 
-delta = 20
-BLOCKCNT = 150
+BLOCKCNT = int((display_width / delta) * (display_height / delta) / 8)
 
 robotsize = (delta, delta)
+
+xcnt = int((display_width / delta) - 1)
+ycnt = int((display_height / delta) - 1)
 
 global SCREEN, FPSCLOCK
 FPS = 20
@@ -42,14 +46,14 @@ WHITE = (255, 255, 255)
 
 class Cell:
     def __init__(self, pos):
-        (self.x, self.y) = pos
+        self.pos = pos
         self.G = 0
         self.H = 0
         self.F = 0
         self.flag = 0  # 0:空 1:障碍 2:起点 3: 终点 4:轨迹
 
     def getPos(self):
-        return (self.x, self.y)
+        return self.pos
 
     def setEmpty(self):
         self.flag = 0
@@ -81,6 +85,34 @@ class Cell:
     def isTrack(self):
         return (4 == self.flag)
 
+    def getPosCell(self, pos):
+        (x, y) = pos
+        if 0 <= x <= xcnt and 0 <= y <= ycnt:
+            return maplist[(x, y)]
+        return False
+
+    def getUp(self):
+        (x, y) = self.pos
+        return getPosCell((x, y - 1))
+
+    def getDown(self):
+        (x, y) = self.pos
+        return getPosCell((x, y + 1))
+
+    def getLeft(self):
+        (x, y) = self.pos
+        return getPosCell((x - 1, y))
+
+    def getRight(self):
+        (x, y) = self.pos
+        return getPosCell((x + 1, y))
+
+    def calcPossibleDir(self):
+        pass
+
+    def selectDir(self, dstPos):
+        pass
+
     def calcF(self):
         self.F = self.G + self.H
 
@@ -105,9 +137,11 @@ def fillRect(pos, color=WHITE):
 def genRdBlockList(cnt=BLOCKCNT):
     blocklist = []
     for i in xrange(cnt):
-        posx = random.randint(0, (display_width / delta) - 1)
-        posy = random.randint(0, (display_height / delta) - 1)
-        if (posx, posy) not in blocklist:
+        posx = random.randint(0, xcnt)
+        posy = random.randint(0, ycnt)
+        if (posx, posy) == (0, 0):
+            pass
+        elif (posx, posy) not in blocklist:
             blocklist.append((posx, posy))
     return blocklist
 
@@ -120,11 +154,16 @@ def drawGrid(color=WHITE):
 
 
 def genMap():
+    for x in xrange(0, xcnt + 1):
+        for y in xrange(0, ycnt + 1):
+            pos = (x, y)
+            c = Cell(pos)
+            maplist[pos] = c
+
     blist = genRdBlockList()
     for p in blist:
-        c = Cell(p)
+        c = maplist[p]
         c.setBlock()
-        maplist[p] = c
 
 
 def drawMap():
@@ -140,6 +179,16 @@ def drawMap():
             fillRect(v.getPos(), (255, 0, 0))
         elif v.isTrack():
             fillRect(v.getPos(), (0, 255, 0))
+
+
+def moveTo(posFrom, posDst):
+    c = maplist[posFrom]
+    if posFrom == posDst:
+        print("move to dst postion success")
+    else:
+        pass
+    c.setTrack()
+    return c
 
 
 if __name__ == "__main__":
@@ -163,27 +212,22 @@ if __name__ == "__main__":
                         if index == 0:
                             # print("Pressed LEFT Button!")
                             p = getPosxyByXy(pygame.mouse.get_pos())
-                            c = Cell(p)
+                            c = maplist[p]
                             c.setStart()
-                            if not maplist.has_key(p):
-                                maplist[p] = c
                         elif index == 1:
                             print("The mouse whell Pressed!")
                         elif index == 2:
                             # print("Pressed RIGHT Button!")
                             p = getPosxyByXy(pygame.mouse.get_pos())
-                            c = Cell(p)
+                            c = maplist[p]
                             c.setEnd()
-                            if not maplist.has_key(p):
-                                maplist[p] = c
-                # pos = pygame.mouse.get_pos()
-                # print(pos)
-            elif event.type == MOUSEMOTION:
-                pos = pygame.mouse.get_pos()
-                mouse_x = pos[0]
-                mouse_y = pos[1]
+            # elif event.type == MOUSEMOTION:
+            # pos = pygame.mouse.get_pos()
+            # mouse_x = pos[0]
+            # mouse_y = pos[1]
 
         drawMap()
+        moveTo((0, 0), (5, 5))
 
         FPSCLOCK.tick(FPS)
         pygame.display.update()

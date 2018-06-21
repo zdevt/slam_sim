@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-19 09:47:15
-#  Last Modified:  2018-06-19 15:32:13
+#  Last Modified:  2018-06-21 13:34:41
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -29,8 +29,10 @@ class Node:
             raise Exception("node position can't beyond the border!")
 
         this.father = father
+
         this.x = x
         this.y = y
+
         if father != None:
             G2father = calc_G(father, this)
             if not G2father:
@@ -68,18 +70,12 @@ def calc_H(cur, end):
     return abs(end.x - cur.x) + abs(end.y - cur.y)
 
 
-# NOTE 这个地方可能成为性能瓶颈
 def min_F_node():
     if len(open_list) == 0:
         raise Exception("not exist path!")
 
-    _min = 9999999999999999
-    _k = (start.x, start.y)
-    for k, v in open_list.items():
-        if _min > v.F:
-            _min = v.F
-            _k = k
-    return open_list[_k]
+    k = sorted(open_list.items(), key=lambda x: x[1], reverse=False)[0]
+    return open_list[k[0]]
 
 
 # 把相邻节点加入open list, 如果发现终点说明找到了路径
@@ -94,30 +90,37 @@ def addAdjacentIntoOpen(node):
         _adjacent.append(Node(node, node.x - 1, node.y - 1))
     except Exception, e:
         pass
+
     try:
         _adjacent.append(Node(node, node.x, node.y - 1))
     except Exception, e:
         pass
+
     try:
         _adjacent.append(Node(node, node.x + 1, node.y - 1))
     except Exception, e:
         pass
+
     try:
         _adjacent.append(Node(node, node.x + 1, node.y))
     except Exception, e:
         pass
+
     try:
         _adjacent.append(Node(node, node.x + 1, node.y + 1))
     except Exception, e:
         pass
+
     try:
         _adjacent.append(Node(node, node.x, node.y + 1))
     except Exception, e:
         pass
+
     try:
         _adjacent.append(Node(node, node.x - 1, node.y + 1))
     except Exception, e:
         pass
+
     try:
         _adjacent.append(Node(node, node.x - 1, node.y))
     except Exception, e:
@@ -129,6 +132,7 @@ def addAdjacentIntoOpen(node):
             end.reset_father(node, new_G)
             print "find path finish!"
             return True
+
         if (a.x, a.y) in close_list:
             continue
 
@@ -151,7 +155,6 @@ def find_the_path(start, end):
         while not addAdjacentIntoOpen(the_node):
             the_node = min_F_node()
     except Exception, e:
-        # path not exist
         print e
         return False
 
