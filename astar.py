@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-19 09:47:15
-#  Last Modified:  2018-06-21 13:34:41
+#  Last Modified:  2018-06-21 13:39:49
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -221,38 +221,39 @@ def preset_map():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        preset_map()
-    else:
-        x = int(sys.argv[1])
-        y = int(sys.argv[2])
-        map_border = (x, y)
+    # if len(sys.argv) < 3:
+        # preset_map()
+    # else:
+        # x = int(sys.argv[1])
+        # y = int(sys.argv[2])
+        # map_border = (x, y)
 
-        _start = raw_input('pls input start point:')
-        _end = raw_input('pls input end point:')
-        _start = _start.split(',')
-        _end = _end.split(',')
-        _start = (int(_start[0]), int(_start[1]))
-        _end = (int(_end[0]), int(_end[1]))
-        start = Node(None, _start[0], _start[1])
-        end = Node(None, _end[0], _end[1])
-        # gen map
-        _2dmap = [['.' for i in xrange(y)] for i in xrange(x)]
-        # put start and end
-        _2dmap[_start[0]][_start[1]] = 'S'
-        _2dmap[_end[0]][_end[1]] = 'E'
-        # input blocks
-        while True:
-            _block = raw_input('input block:')
-            if not _block:
-                break
+        # _start = raw_input('pls input start point:')
+        # _end = raw_input('pls input end point:')
+        # _start = _start.split(',')
+        # _end = _end.split(',')
+        # _start = (int(_start[0]), int(_start[1]))
+        # _end = (int(_end[0]), int(_end[1]))
+        # start = Node(None, _start[0], _start[1])
+        # end = Node(None, _end[0], _end[1])
+        # # gen map
+        # _2dmap = [['.' for i in xrange(y)] for i in xrange(x)]
+        # # put start and end
+        # _2dmap[_start[0]][_start[1]] = 'S'
+        # _2dmap[_end[0]][_end[1]] = 'E'
+        # # input blocks
+        # while True:
+            # _block = raw_input('input block:')
+            # if not _block:
+                # break
 
-            _block = _block.split(',')
-            _block = (int(_block[0]), int(_block[1]))
-            _2dmap[_block[0]][_block[1]] = 'X'
-            block_node = Node(None, _block[0], _block[1])
-            close_list[(block_node.x, block_node.y)] = block_node
+            # _block = _block.split(',')
+            # _block = (int(_block[0]), int(_block[1]))
+            # _2dmap[_block[0]][_block[1]] = 'X'
+            # block_node = Node(None, _block[0], _block[1])
+            # close_list[(block_node.x, block_node.y)] = block_node
 
+    preset_map()
     print "orignal map:"
     print_map()
 
