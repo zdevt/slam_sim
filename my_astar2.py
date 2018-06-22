@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-21 13:37:41
-#  Last Modified:  2018-06-21 15:21:15
+#  Last Modified:  2018-06-22 08:58:11
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -15,6 +15,7 @@
 
 import os
 import sys
+import copy
 import math
 import pygame
 import random
@@ -28,7 +29,7 @@ delta = 20
 display_width, display_height = 800, 600
 display_res = (display_width + 1, display_height + 1)
 
-BLOCKCNT = int((display_width / delta) * (display_height / delta) / 8)
+BLOCKCNT = int((display_width / delta) * (display_height / delta) / 10)
 
 xcnt = int((display_width / delta) - 1)
 ycnt = int((display_height / delta) - 1)
@@ -45,6 +46,9 @@ end = None
 
 block_list = []
 tracklist = []
+
+tracklistRec = {}
+
 open_list = {}
 close_list = {}
 
@@ -160,11 +164,27 @@ def addAdjacentIntoOpen(node):
 
 
 def find_the_path(start, end):
+    global tracklist, block_list
+
+    open_list.clear()
+    close_list.clear()
+    del tracklist[:]
+
+    for p in block_list:
+        (posx, posy) = p
+        block_node = Node(None, posx, posy)
+        close_list[(block_node.x, block_node.y)] = block_node
+
     open_list[(start.x, start.y)] = start
     the_node = start
+    i = 0
 
     while not addAdjacentIntoOpen(the_node):
+        i = i + 1
         the_node = min_F_node()
+        if i > xcnt * ycnt:
+            print("quit")
+            return False
 
     return True
 
@@ -228,6 +248,27 @@ def drawMap():
         fillRect((end.x, end.y), (255, 0, 0))
 
 
+def findThePaths(cnt=20):
+    global tracklistRec
+    global tracklist
+
+    tracklistRec.clear()
+
+    for x in xrange(cnt):
+        del tracklist[:]
+        if find_the_path(start, end):
+            mark_path(end.father)
+            if len(tracklist) > 0:
+                l = copy.deepcopy(tracklist)
+                tracklistRec[len(l)] = l
+                print("num=", x, "key=", len(l))
+
+    if len(tracklistRec) > 0:
+        k = sorted(tracklistRec.keys())
+        print("choose=", k[0])
+        tracklist = tracklistRec[k[0]]
+
+
 if __name__ == "__main__":
     pygame.init()
     SCREEN = pygame.display.set_mode(display_res, 0, 32)
@@ -259,19 +300,13 @@ if __name__ == "__main__":
 
                             flag = True
 
-                            open_list.clear()
-                            close_list.clear()
-                            del tracklist[:]
-
-                            for p in block_list:
-                                (posx, posy) = p
-                                block_node = Node(None, posx, posy)
-                                close_list[(block_node.x,
-                                            block_node.y)] = block_node
-
-        if flag and find_the_path(start, end):
-            mark_path(end.father)
+        if flag:
+            findThePaths()
             flag = False
+
+        # if flag and find_the_path(start, end):
+        # mark_path(end.father)
+        # flag = False
 
         drawMap()
 
