@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-19 16:22:23
-#  Last Modified:  2018-06-23 10:50:35
+#  Last Modified:  2018-06-23 11:14:14
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -37,7 +37,8 @@ FPS = 10
 WHITE = (255, 255, 255)
 
 startPoint = (0, 0)
-targetPoint = (xcnt, ycnt)
+# targetPoint = (xcnt, ycnt)
+targetPoint = (xcnt + 5, ycnt + 5)
 # targetPoint = (2, 2)
 currentPoint = None
 
@@ -140,7 +141,6 @@ def DfsAlg2(block_list, arrive_list, back_list):
 
     stepComplete = False
 
-    # while not stepComplete:
     (cx, cy) = currentPoint
     mvlist = [(cx + x, cy + y) for (x, y) in moveDirection]
 
@@ -155,7 +155,6 @@ def DfsAlg2(block_list, arrive_list, back_list):
         if not BackStep(arrive_list, back_list):
             allComplete = True
             print("error.........")
-            # break
 
 
 def getPosxyByXy((x, y)):
