@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-19 16:22:23
-#  Last Modified:  2018-06-23 10:36:16
+#  Last Modified:  2018-06-23 10:50:35
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -32,7 +32,7 @@ xcnt = int((display_width / delta) - 1)
 ycnt = int((display_height / delta) - 1)
 
 global SCREEN, FPSCLOCK
-FPS = 5
+FPS = 10
 
 WHITE = (255, 255, 255)
 
@@ -125,6 +125,7 @@ def DfsAlg2(block_list, arrive_list, back_list):
     global stepComplete, allComplete, currentPoint
 
     if not currentPoint:
+        print("init currentPoint")
         currentPoint = startPoint
 
     if allComplete:
@@ -139,20 +140,22 @@ def DfsAlg2(block_list, arrive_list, back_list):
 
     stepComplete = False
 
-    while not stepComplete:
-        (cx, cy) = currentPoint
-        mvlist = [(cx + x, cy + y) for (x, y) in moveDirection]
+    # while not stepComplete:
+    (cx, cy) = currentPoint
+    mvlist = [(cx + x, cy + y) for (x, y) in moveDirection]
 
-        for pos in mvlist:
-            if NextStep(pos, arrive_list, block_list, back_list):
-                stepComplete = True
-                break
+    for pos in mvlist:
+        if NextStep(pos, arrive_list, block_list, back_list):
+            stepComplete = True
+            break
+        else:
+            stepComplete = False
 
-        if not stepComplete:
-            if not BackStep(arrive_list, back_list):
-                allComplete = True
-                print("error.........")
-                break
+    if not stepComplete:
+        if not BackStep(arrive_list, back_list):
+            allComplete = True
+            print("error.........")
+            # break
 
 
 def getPosxyByXy((x, y)):
