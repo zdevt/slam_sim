@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-19 16:22:23
-#  Last Modified:  2018-06-23 11:14:14
+#  Last Modified:  2018-06-23 15:46:12
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -26,13 +26,14 @@ delta = 20
 display_width, display_height = 800, 600
 display_res = (display_width + 1, display_height + 1)
 
-BLOCKCNT = int((display_width / delta) * (display_height / delta) / 8)
+BLOCKCNT = int((display_width / delta) * (display_height / delta) / 15)
+# BLOCKCNT = 1
 
 xcnt = int((display_width / delta) - 1)
 ycnt = int((display_height / delta) - 1)
 
 global SCREEN, FPSCLOCK
-FPS = 10
+FPS = 30
 
 WHITE = (255, 255, 255)
 
