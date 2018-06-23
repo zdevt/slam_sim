@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-19 16:22:23
-#  Last Modified:  2018-06-23 15:46:12
+#  Last Modified:  2018-06-23 15:47:48
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -33,7 +33,7 @@ xcnt = int((display_width / delta) - 1)
 ycnt = int((display_height / delta) - 1)
 
 global SCREEN, FPSCLOCK
-FPS = 30
+FPS = 20
 
 WHITE = (255, 255, 255)
 
