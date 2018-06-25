@@ -6,7 +6,7 @@
 #
 #        Version:  1.0
 #        Created:  2018-06-21 13:37:41
-#  Last Modified:  2018-06-22 09:57:29
+#  Last Modified:  2018-06-23 15:53:42
 #       Revision:  none
 #       Compiler:  gcc
 #
@@ -248,7 +248,7 @@ def drawMap():
         fillRect((end.x, end.y), (255, 0, 0))
 
 
-def findThePaths(cnt=3):
+def findThePaths(cnt=5):
     global tracklistRec
     global tracklist
 
